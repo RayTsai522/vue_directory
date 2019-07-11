@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <form>
+            <div class="row mb-2 ">
+                <div class="col ">
+                    <input type="text" class="form-control col" placeholder="First Name" v-model="input.firstname">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Last Name" v-model="input.lastname">
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-8">
+                    <input type="text" class="form-control" placeholder="Phone Number" v-model="input.phone">
+                </div>
+                <div class="col-4">
+                    <select class="form-control" v-model="input.gender">
+                        <option>male</option>
+                        <option>female</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <button type="button" class="btn btn-dark" @click="confirm">送出</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-dark table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>編號</th>
+                    <th>大頭貼</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>性別</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, i ) in userData" :key="(item, i )">
+                    <th>{{ i +1 }}</th>
+                    <td><img :src="item.picture.medium"></td>
+                    <td>{{ item.name.first }}</td>
+                    <td>{{ item.name.last }}</td>
+                    <td>{{ item.gender === 'male' ? '男' : '女'}}</td>
+                    <td>{{ item.phone}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    let app = new Vue({
+        el: '#app',
+        data: {
+            hello: 'hellow world',
+            userData: [],
+            input: {
+                firstname: '',
+                lastname: '',
+                phone: '',
+                gender: 'male',
+                picture: 'https://randomuser.me/api/portraits/med/'
+            }
+        },
+        computed: {
+            
+        },
+        methods: {
+            getData() {
+                axios.get('https://randomuser.me/api/?results=10')
+                    .then(res => {
+                        console.log(res);
+                        this.userData = res.data.results
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            },
+            confirm() {
+                let randomNumber = this.randomPicture(1, 50)
+                //判斷使用者性別
+                let userGender = this.input.gender === 'male' ? 'men' : 'women'
+                this.userData.push({
+                    picture: {
+                        medium: `${this.input.picture +userGender}/${randomNumber}.jpg`
+                    },
+                    name: {
+                        first: this.input.firstname,
+                        last: this.input.lastname
+                    },
+                    phone: this.input.phone,
+                    gender: this.input.gender
+                })
+            },
+            //設定上下限，並從中取一隨機整數
+            randomPicture(min,max){
+                return Math.floor(Math.random()*(max-min+1))+min;
+            }
+        },
+        mounted() {
+            this.getData();
+        }
+    })
+
+</script>
+
+</html>
